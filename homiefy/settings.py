@@ -24,8 +24,10 @@ SECRET_KEY = 'm*dj*ydetxk20m7-&2d(3gn33!&3s*d&hoa=1!ma11fm-1f3gj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+DOC_API     = True
+DJANGO_HOST = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,11 +39,31 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',         #Auth token App
+    'rest_framework_swagger',           #Swagger to develop
+    'corsheaders',
 ]
+
+#DYNAMODB SETTINGS
+DYNAMODB_HOST   = '0.0.0.0'
+DYNAMODB_PORT   = '8080'
+
+REST_FRAMEWORK = {
+    'PAGE_SIZE' : 10,
+    'DEFAULT_AUTHENTICATION_CLASSES' : (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.ScopedRateThrottle',
+    )
+    
+}
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -49,6 +71,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'homiefy.urls'
 
@@ -82,23 +106,14 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+SWAGGER_SETTINGS = {
+        'info': {
+        'contact': 'jballesterpuig@gmail.com',
+        'description': 'API for HACKUPC2021 project ',
+        'license': 'nolicense',
+        'title': 'Homiefy API',
+    }
+}
 
 
 # Internationalization
