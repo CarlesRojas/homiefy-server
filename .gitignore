@@ -1,0 +1,25 @@
+*.pyc
+*migrations*
+
+env/
+*.sql
+*.diff
+
+\.vscode/
+
+# Django-environ files
+.env
+!.env.example
+*migrations*
+env/
+*.sql
+*.diff
+
+\.vscode/
+
+
+**/fixtures/*
+fixtures/*.json
+fixtures/**/*.json
+!fixtures/fixtures.tar.gz
+!fixtures/number_of_fixtures.txt
