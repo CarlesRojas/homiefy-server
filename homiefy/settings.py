@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',         #Auth token App
     'rest_framework_swagger',           #Swagger to develop
     'corsheaders',
+
+    'userData',
 ]
 
 #DYNAMODB SETTINGS
