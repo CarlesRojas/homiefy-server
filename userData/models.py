@@ -30,14 +30,14 @@ class UtilitiesTable(dynamoDbTable):
     DataInstanceFactory = UtilitiesEntry
 
     AttributeDefinitions = [
-        {'AttributeName': 'name',          'AttributeType': 'S'},
-        {'AttributeName': 'username',      'AttributeType': 'S'},
+        {'AttributeName': 'username',          'AttributeType': 'S'},
+        {'AttributeName': 'name',      'AttributeType': 'S'},
     ]
 
 
     KeySchema = [
-        {'AttributeName': 'name',   'KeyType': 'HASH'},
-        {'AttributeName': 'username',  'KeyType': 'RANGE'},
+        {'AttributeName': 'username',   'KeyType': 'HASH'},
+        {'AttributeName': 'name',  'KeyType': 'RANGE'},
     ]
 
     ProvisionedThroughput = {

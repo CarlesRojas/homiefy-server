@@ -4,7 +4,7 @@ from userData import views
 
 
 urlpatterns = [
-   url(r'^userData/debts/$', views.debts.as_view()),
+   url(r'^userData/utilities/$', views.utilities.as_view()),
 
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

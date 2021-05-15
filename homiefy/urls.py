@@ -13,9 +13,23 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
-from django.contrib import admin
+from django.conf.urls import url, include
+from rest_framework import routers
+from rest_framework.urlpatterns import format_suffix_patterns
+from userData import views
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-]
+
+
+urlpatterns = []
+
+urlpatterns.extend([
+    #url(r'^admin/', admin.site.urls),
+    url(r'^', include('userData.urls')),
+    url(r'^', include('fileManager.urls')),
+    #url(r'^login/emailCheck/$', views.TestAPI.as_view()),
+])
+
+
+urlpatterns.extend([
+    url(r'^docs/', include('rest_framework_swagger.urls')),
+])
