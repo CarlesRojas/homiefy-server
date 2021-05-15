@@ -121,7 +121,7 @@ class utilities(APIView):
 
 
 
-class balance(APIView):
+class AddBalance(APIView):
     #permission_classes = (AllowAny, )
 
     def post(self, request, format=None):
@@ -133,7 +133,7 @@ class balance(APIView):
             - name : body
               pytype: newExpenseSerializer
               paramType: body
-              description : Invoicing data
+              description : Expenses data
         responseMessages:
             - code: 200
               message: error 0. All okey
@@ -246,5 +246,43 @@ class balance(APIView):
         expenseUser.save()
 
         return Response( {'Error': 0}, status=status.HTTP_200_OK)
+
+
+class Balance(APIView):
+    #permission_classes = (AllowAny, )
+
+    def post(self, request, format=None):
+        """
+        Retrive a user Balance.
+        ---
+        many: False
+        parameters:
+            - name : body
+              pytype: ExpenseSelectorSerializer
+              paramType: body
+              description : Expenses data
+        responseMessages:
+            - code: 200
+              message: error 0. All okey
+            - code: 500
+              message: error 108. Internal server error
+        """
+        in_data = ExpenseSelectorSerializer(data=request.data)
+        in_data.is_valid(raise_exception=True)
+
+        username    = in_data.validated_data.get('username')
+
+        expenses = ExpensesTable.filter(username =username)
+        if expenses:
+            expenseUser = expenses[0]
+        else:
+            package = {
+                "username" : username,
+                "balance" : {},
+            }
+            expenseUser = ExpensesEntry(**package)
+        
+        return Response( expenseUser.balance, status=status.HTTP_200_OK)
+    
 
         

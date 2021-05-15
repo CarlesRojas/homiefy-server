@@ -46,3 +46,10 @@ class newExpenseSerializer(serializers.Serializer):
     people          = serializers.ListField(required=True,     help_text="people that uses that is involved in the expense")
     price           = serializers.DecimalField(max_digits=20, decimal_places=5,      help_text="price of the expense")
     name            = serializers.CharField(required=False,       help_text="name of the utility")
+
+
+class ExpenseSelectorSerializer(serializers.Serializer):
+    """
+        Serializer for the new Expense.
+    """
+    username        =serializers.CharField(required=True, help_text="user that pays the utility")

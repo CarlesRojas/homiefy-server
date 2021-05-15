@@ -4,8 +4,9 @@ from userData import views
 
 
 urlpatterns = [
-   url(r'^userData/utilities/$', views.utilities.as_view()),
-   url(r'^userData/balance/$', views.balance.as_view()),
+   url(r'^utilities/$', views.utilities.as_view()),
+   url(r'^balance/add/$', views.AddBalance.as_view()),
+   url(r'^balance/$', views.Balance.as_view()),
 
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
