@@ -84,3 +84,44 @@ class ExpensesTable(dynamoDbTable):
         'ReadCapacityUnits':  10,
         'WriteCapacityUnits': 10
     }
+
+
+class PostitEntry(dynamoDbInstance):
+    """
+        Table holding the Post-its
+    """
+    VALID_CONSTRUCTOR_KEYS = ['username',
+                              'message',        #message of the utility
+                              'priorityType',       #level of priority
+                              'people',      #people that uses that utility
+                              'period',      #days of the utility period
+
+                              ]
+
+    def __init__(self, **kwargs):
+        self.constructor(**kwargs)
+        self.DYDB_TABLE = UtilitiesTable
+
+
+class PostitTable(dynamoDbTable):
+    """
+        Table with the Postits
+    """
+
+    Name = 'Postit'
+    DataInstanceFactory = PostitEntry
+
+    AttributeDefinitions = [
+        {'AttributeName': 'username',          'AttributeType': 'S'}
+    ]
+
+
+    KeySchema = [
+        {'AttributeName': 'username',   'KeyType': 'HASH'}
+    ]
+
+    ProvisionedThroughput = {
+        'ReadCapacityUnits':  10,
+        'WriteCapacityUnits': 10
+    }
+
