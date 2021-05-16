@@ -10,7 +10,7 @@ import homiefy.constants as CT
 from datetime import datetime
 from decimal import Decimal
 import decimal
-
+import uuid
 
 class utilities(APIView):
     #permission_classes = (AllowAny, )
@@ -182,12 +182,18 @@ class AddBalance(APIView):
                 }
 
                 expenses = ExpensesEntry(**package)
+
+            print expenses.username
+            print expenses.balance
             if username in expenses["balance"]:
                 
                 sumExpenses = 0
                 for key in expenses["balance"][username]:
                     sumExpenses +=expenses["balance"][username][key]
                 
+                print "SUM EXPENSES: ", sumExpenses
+                
+                #si ja li deviem diners li sumem si ja existia la categoria o creem la caeoria de 0
                 if sumExpenses <= 0:
 
                     if name in expenses["balance"][username]: 
@@ -200,13 +206,14 @@ class AddBalance(APIView):
                         expenseUser["balance"][person][name] = pricePerPerson * -1
                 
                 else:
-                    if sumExpenses > abs(pricePerPerson):
+                    if sumExpenses < abs(pricePerPerson):
                         rest = pricePerPerson + sumExpenses
 
                         print "CASE 3"
                         expenses["balance"][username] = {}
                         expenses["balance"][username][name] = rest
 
+                        print "REST: ", pricePerPerson, "+", sumExpenses, "=", rest
                         expenseUser["balance"][person]  = {}
                         expenseUser["balance"][person][name] = rest * -1
                     
@@ -234,7 +241,7 @@ class AddBalance(APIView):
             expenseUser["balance"] = {x:y for x,y in expenseUser["balance"].items() if y}
 
             
-            print expenses.username
+            
             print expenses.balance
             print "-"*60
             print
@@ -284,5 +291,221 @@ class Balance(APIView):
         
         return Response( expenseUser.balance, status=status.HTTP_200_OK)
     
+def multikeysort(items, columns):
+    from operator import itemgetter
+    comparers = [((itemgetter(col[1:].strip()), -1) if col.startswith('-') else
+                  (itemgetter(col.strip()), 1)) for col in columns]
+    def comparer(left, right):
+        for fn, mult in comparers:
+            result = cmp(fn(left), fn(right))
+            if result:
+                return mult * result
+        else:
+            return 0
+    return sorted(items, cmp=comparer)
+
+
+
+class Postit(APIView):
+    #permission_classes = (AllowAny, )
+
+    def post(self, request, format=None):
+        """
+        Store a postit.
+        ---
+        many: False
+        parameters:
+            - name : body
+              pytype: PostitSerializer
+              paramType: body
+              description : Expenses data
+        responseMessages:
+            - code: 200
+              message: error 0. All okey
+            - code: 500
+              message: error 108. Internal server error
+        """
+        in_data = PostitSerializer(data=request.data)
+        in_data.is_valid(raise_exception=True)
+
+        username        = in_data.validated_data.get('username')
+        message         = in_data.validated_data.get("message")
+        priorityType    = in_data.validated_data.get("priorityType")
+        people          = in_data.validated_data.get("people")
+        period          = in_data.validated_data.get("period")
+        createdDate          = in_data.validated_data.get("createdDate")
+
+        _uuid = str(uuid.uuid1())
+        dydbInst = PostitTable.filter(username=username, id = _uuid)
+
+        package = {
+            "username" : username,
+            "id":_uuid,
+            "message" : message,
+            "priorityType" : priorityType,
+            "people" : people,
+            "period" : period,
+            "createdDate": createdDate,
+        }
+
+        c = PostitEntry(**package)
+        c.save()
+
+        return Response( {'Error': 0}, status=status.HTTP_200_OK)
+    
+    def get(self, request, format=None):
+        """
+        Returns all the postits
+        ---
+        response_serializer: UtilityDictSerializer
+        many: False
+        responseMessages:
+            - code: 200
+              message: error 0. Mail sended.
+            - code: 500
+              message: error 108. Internal mail server error
+        """
+
+        postits = []
+        for user in CT.USERNAMES:
+            postits += PostitTable.filter(username =user)
+
+        postits = [{"username":p.username, "message":p.message, "priorityType": p.priorityType,
+                     "people":p.people, "period":p.period, "uuid": p.id, "createdDate": p.createdDate}for p in postits]
+
+        a = multikeysort(postits, ['-priorityType', 'period'])
+        print a
+
+        return Response( {"response":a}, status=status.HTTP_200_OK)
+
+    def delete(self, request, format=None):
+        """
+        Deletes a postit
+        ---
+        many: False
+        parameters:
+            - name : body
+              pytype: PostitSelectorSerializer
+              paramType: body
+              description : Invoicing data
+        responseMessages:
+            - code: 200
+              message: error 0. All okey
+            - code: 500
+              message: error 108. Internal server error
+        """
+        in_data = PostitSelectorSerializer(data=request.data)
+        in_data.is_valid(raise_exception=True)
+
+
+        username    = in_data.validated_data.get('username')
+        uuiid        = in_data.validated_data.get('uuid')
+
+
+        dydbInst = PostitTable.filter(username=username,
+                                        id=uuiid)
+
+        if dydbInst:
+            dydbInst[0].delete()
+
+        return Response( {'Error': 0}, status=status.HTTP_200_OK)
 
         
+
+class List(APIView):
+    #permission_classes = (AllowAny, )
+
+    def post(self, request, format=None):
+        """
+        Store a element to the list.
+        ---
+        many: False
+        parameters:
+            - name : body
+              pytype: ListSerializer
+              paramType: body
+              description : Expenses data
+        responseMessages:
+            - code: 200
+              message: error 0. All okey
+            - code: 500
+              message: error 108. Internal server error
+        """
+        in_data = ListSerializer(data=request.data)
+        in_data.is_valid(raise_exception=True)
+
+        name            = in_data.validated_data.get('name')
+        people          = in_data.validated_data.get("people")
+        price           = in_data.validated_data.get("price")
+
+        _uuid = str(uuid.uuid1())
+        print _uuid
+        dydbInst = ListTable.filter(username="list",  id = _uuid)
+
+        package = {
+            "username" : "list",
+            "name" : name,
+            "id":_uuid,
+            "people" : people,
+            "price" : price,
+        }
+
+        c = ListEntry(**package)
+        c.save()
+
+        return Response( {'Error': 0}, status=status.HTTP_200_OK)
+    
+    def get(self, request, format=None):
+        """
+        Returns all the postits
+        ---
+        response_serializer: UtilityDictSerializer
+        many: False
+        responseMessages:
+            - code: 200
+              message: error 0. Mail sended.
+            - code: 500
+              message: error 108. Internal mail server error
+        """
+
+        postits = []
+        postits += ListTable.filter(username ="list")
+
+        postits = [{"name":p.name, "price":p.price,
+                     "people":p.people,"uuid": p.id}for p in postits]
+
+        a = multikeysort(postits, ['name'])
+        print a
+
+        return Response( {"response":a}, status=status.HTTP_200_OK)
+
+    def delete(self, request, format=None):
+        """
+        Deletes a postit
+        ---
+        many: False
+        parameters:
+            - name : body
+              pytype: ListSelectorSerializer
+              paramType: body
+              description : Invoicing data
+        responseMessages:
+            - code: 200
+              message: error 0. All okey
+            - code: 500
+              message: error 108. Internal server error
+        """
+        in_data = ListSelectorSerializer(data=request.data)
+        in_data.is_valid(raise_exception=True)
+
+
+        uuiid        = in_data.validated_data.get('uuid')
+
+
+        dydbInst = ListTable.filter(username="list",
+                                        id=uuiid)
+
+        if dydbInst:
+            dydbInst[0].delete()
+
+        return Response( {'Error': 0}, status=status.HTTP_200_OK)

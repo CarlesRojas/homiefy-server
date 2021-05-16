@@ -91,16 +91,18 @@ class PostitEntry(dynamoDbInstance):
         Table holding the Post-its
     """
     VALID_CONSTRUCTOR_KEYS = ['username',
+                               'id',            #unique id identifier
                               'message',        #message of the utility
                               'priorityType',       #level of priority
                               'people',      #people that uses that utility
                               'period',      #days of the utility period
+                              'createdDate',
 
                               ]
 
     def __init__(self, **kwargs):
         self.constructor(**kwargs)
-        self.DYDB_TABLE = UtilitiesTable
+        self.DYDB_TABLE = PostitTable
 
 
 class PostitTable(dynamoDbTable):
@@ -112,12 +114,59 @@ class PostitTable(dynamoDbTable):
     DataInstanceFactory = PostitEntry
 
     AttributeDefinitions = [
-        {'AttributeName': 'username',          'AttributeType': 'S'}
+        {'AttributeName': 'username',          'AttributeType': 'S'},
+        {'AttributeName': 'id',      'AttributeType': 'S'},
     ]
 
 
     KeySchema = [
-        {'AttributeName': 'username',   'KeyType': 'HASH'}
+        {'AttributeName': 'username',   'KeyType': 'HASH'},
+        {'AttributeName': 'id',  'KeyType': 'RANGE'},
+    ]
+
+    ProvisionedThroughput = {
+        'ReadCapacityUnits':  10,
+        'WriteCapacityUnits': 10
+    }
+
+
+
+
+
+class ListEntry(dynamoDbInstance):
+    """
+        Table holding the Post-its
+    """
+    VALID_CONSTRUCTOR_KEYS = ['name',
+                               'id',            #unique id identifier
+                              'people',      #people that uses that utility
+                              'price',      #days of the utility period
+                              'username',      
+
+                              ]
+
+    def __init__(self, **kwargs):
+        self.constructor(**kwargs)
+        self.DYDB_TABLE = ListTable
+
+
+class ListTable(dynamoDbTable):
+    """
+        Table with the Postits
+    """
+
+    Name = 'List'
+    DataInstanceFactory = ListEntry
+
+    AttributeDefinitions = [        
+        {'AttributeName': 'username',          'AttributeType': 'S'},
+        {'AttributeName': 'id',      'AttributeType': 'S'},
+    ]
+
+
+    KeySchema = [
+        {'AttributeName': 'username',   'KeyType': 'HASH'},
+        {'AttributeName': 'id',  'KeyType': 'RANGE'},
     ]
 
     ProvisionedThroughput = {

@@ -53,3 +53,39 @@ class ExpenseSelectorSerializer(serializers.Serializer):
         Serializer for the new Expense.
     """
     username        =serializers.CharField(required=True, help_text="user that pays the utility")
+
+
+class PostitSerializer(serializers.Serializer):
+    """
+        Serializer for the new utility.
+    """
+    username        =serializers.CharField(required=True, help_text="user that pays the utility")
+    message         = serializers.CharField(required=False,       help_text="message of the postit")
+    priorityType           = serializers.IntegerField(required=True,      help_text="Level of priority")
+    people          = serializers.ListField(required=True,     help_text="people that uses that utility")
+    period          = serializers.IntegerField(required=True,     help_text="days of the utility period")
+    createdDate     = serializers.CharField(required=True,help_text="date of the creation")
+
+class PostitSelectorSerializer(serializers.Serializer):
+    """
+        Serializer for the new Expense.
+    """
+    username        =serializers.CharField(required=True, help_text="user that created the postit")
+    uuid         = serializers.CharField(required=False,       help_text="unique identifier")
+    
+
+
+
+class ListSerializer(serializers.Serializer):
+    """
+        Serializer for the new element in the list
+    """
+    name        =serializers.CharField(required=True, help_text="user that pays the utility")
+    people          = serializers.ListField(required=True,     help_text="people that uses that utility")
+    price           = serializers.DecimalField(max_digits=20, decimal_places=5,      help_text="price of the expense")
+
+class ListSelectorSerializer(serializers.Serializer):
+    """
+        Serializer for the new Expense.
+    """
+    uuid        =serializers.CharField(required=True, help_text="id selector")
